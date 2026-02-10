@@ -1,7 +1,10 @@
+'use client';
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { X, Plus, Minus, ArrowRight, Tag, Lock } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
+import React from 'react';
 
 interface CartItem {
   id: string;
@@ -45,6 +48,8 @@ export function CartPage() {
 
   const [promoCode, setPromoCode] = useState('');
   const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
+  const [orderPlaced, setOrderPlaced] = useState(false);
+  const [orderNumber, setOrderNumber] = useState('');
 
   const updateQuantity = (id: string, newQuantity: number) => {
     if (newQuantity < 1) return;
@@ -65,11 +70,59 @@ export function CartPage() {
     }
   };
 
+  const handleCheckout = () => {
+    const generatedOrderNumber = `ORD-${Date.now().toString().slice(-8)}`;
+    setOrderNumber(generatedOrderNumber);
+    setOrderPlaced(true);
+    console.log('[v0] Order placed:', generatedOrderNumber, 'Total:', total);
+  };
+
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const discount = appliedPromo === 'save20' ? subtotal * 0.2 : 0;
   const shipping = subtotal > 500 ? 0 : 15;
   const tax = (subtotal - discount) * 0.08;
   const total = subtotal - discount + shipping + tax;
+
+  if (orderPlaced) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center max-w-md px-4">
+          <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg
+              className="w-12 h-12 text-green-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </div>
+          <h2 className="text-3xl text-neutral-900 mb-2">Order Confirmed!</h2>
+          <p className="text-neutral-600 mb-6">Thank you for your purchase</p>
+          <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-6 mb-8">
+            <p className="text-sm text-neutral-600 mb-2">Order Number</p>
+            <p className="text-2xl font-semibold text-neutral-900 mb-4">{orderNumber}</p>
+            <p className="text-sm text-neutral-600">Total: ${total.toFixed(2)}</p>
+          </div>
+          <p className="text-sm text-neutral-600 mb-8">
+            A confirmation email has been sent to your inbox. You can track your order anytime.
+          </p>
+          <Link
+            to="/shop"
+            className="inline-flex items-center px-8 py-4 bg-neutral-900 text-white rounded-xl hover:bg-neutral-800 transition-colors"
+          >
+            Continue Shopping
+            <ArrowRight className="ml-2 w-5 h-5" />
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (cartItems.length === 0) {
     return (
@@ -126,7 +179,7 @@ export function CartPage() {
                 {/* Image */}
                 <div className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 bg-neutral-100 rounded-xl overflow-hidden">
                   <ImageWithFallback
-                    src={item.image}
+                    src={item.image || "/placeholder.svg"}
                     alt={item.name}
                     className="w-full h-full object-cover"
                   />
@@ -244,7 +297,10 @@ export function CartPage() {
                 </div>
 
                 {/* Checkout Button */}
-                <button className="w-full py-4 bg-neutral-900 text-white rounded-xl hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2">
+                <button 
+                  onClick={handleCheckout}
+                  className="w-full py-4 bg-neutral-900 text-white rounded-xl hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
+                >
                   <Lock className="w-5 h-5" />
                   Secure Checkout
                 </button>

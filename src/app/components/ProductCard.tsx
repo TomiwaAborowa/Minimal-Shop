@@ -1,6 +1,9 @@
+'use client';
+
 import { Link } from 'react-router-dom';
-import { Heart } from 'lucide-react';
+import { Heart, Check } from 'lucide-react';
 import { useState } from 'react';
+import React from 'react';
 
 interface ProductCardProps {
   id: string;
@@ -14,6 +17,7 @@ interface ProductCardProps {
 export function ProductCard({ id, name, price, image, category, isNew }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [addedToCart, setAddedToCart] = useState(false);
 
   return (
     <Link to={`/product/${id}`}>
@@ -25,7 +29,7 @@ export function ProductCard({ id, name, price, image, category, isNew }: Product
         {/* Image Container */}
         <div className="relative aspect-[3/4] bg-neutral-100 rounded-2xl overflow-hidden mb-4">
           <img
-            src={image}
+            src={image || "/placeholder.svg"}
             alt={name}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
@@ -65,10 +69,26 @@ export function ProductCard({ id, name, price, image, category, isNew }: Product
             }`}
           >
             <button
-              onClick={(e) => e.preventDefault()}
-              className="w-full py-3 bg-white text-neutral-900 rounded-xl hover:bg-neutral-900 hover:text-white transition-colors shadow-lg"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log('[v0] Added to cart:', name, price);
+                setAddedToCart(true);
+                setTimeout(() => setAddedToCart(false), 2000);
+              }}
+              className={`w-full py-3 rounded-xl transition-colors shadow-lg flex items-center justify-center gap-2 ${
+                addedToCart
+                  ? 'bg-green-500 text-white'
+                  : 'bg-white text-neutral-900 hover:bg-neutral-900 hover:text-white'
+              }`}
             >
-              Quick Add
+              {addedToCart ? (
+                <>
+                  <Check className="w-5 h-5" />
+                  Added!
+                </>
+              ) : (
+                'Quick Add'
+              )}
             </button>
           </div>
         </div>

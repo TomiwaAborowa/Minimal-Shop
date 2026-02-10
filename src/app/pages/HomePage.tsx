@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Star } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
+import React from 'react';
 
 export function HomePage() {
   const featuredProducts = [

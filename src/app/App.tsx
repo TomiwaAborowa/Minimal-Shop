@@ -5,6 +5,11 @@ import { HomePage } from './pages/HomePage';
 import { ProductListingPage } from './pages/ProductListingPage';
 import { ProductDetailPage } from './pages/ProductDetailPage';
 import { CartPage } from './pages/CartPage';
+import { AboutPage } from './pages/AboutPage';
+import { ContactPage } from './pages/ContactPage';
+import { ShippingPage } from './pages/ShippingPage';
+import { ReturnsPage } from './pages/ReturnsPage';
+import React from 'react';
 
 export default function App() {
   return (
@@ -17,6 +22,10 @@ export default function App() {
             <Route path="/shop" element={<ProductListingPage />} />
             <Route path="/product/:id" element={<ProductDetailPage />} />
             <Route path="/cart" element={<CartPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/shipping" element={<ShippingPage />} />
+            <Route path="/returns" element={<ReturnsPage />} />
           </Routes>
         </main>
         <Footer />

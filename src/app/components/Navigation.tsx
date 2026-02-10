@@ -1,12 +1,29 @@
+'use client';
+
+import React from "react"
+
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingBag, Search, Menu } from 'lucide-react';
+import { ShoppingBag, Search, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 
 export function Navigation() {
   const location = useLocation();
   const [cartCount] = useState(3);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      console.log('[v0] Searching for:', searchQuery);
+      // Navigate to shop or filter products
+      setSearchQuery('');
+      setShowSearch(false);
+    }
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-neutral-200">
@@ -39,7 +56,7 @@ export function Navigation() {
               Collections
             </Link>
             <Link
-              to="/shop"
+              to="/about"
               className="text-neutral-500 hover:text-neutral-900 transition-colors"
             >
               About
@@ -48,7 +65,10 @@ export function Navigation() {
 
           {/* Actions */}
           <div className="flex items-center space-x-4 sm:space-x-6">
-            <button className="text-neutral-600 hover:text-neutral-900 transition-colors">
+            <button 
+              onClick={() => setShowSearch(!showSearch)}
+              className="text-neutral-600 hover:text-neutral-900 transition-colors"
+            >
               <Search className="w-5 h-5" />
             </button>
             <Link
@@ -62,11 +82,63 @@ export function Navigation() {
                 </span>
               )}
             </Link>
-            <button className="md:hidden text-neutral-600 hover:text-neutral-900 transition-colors">
-              <Menu className="w-5 h-5" />
+            <button 
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="md:hidden text-neutral-600 hover:text-neutral-900 transition-colors"
+            >
+              {showMobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
+
+        {/* Search Bar */}
+        {showSearch && (
+          <div className="py-4 border-t border-neutral-200">
+            <form onSubmit={handleSearch} className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1 px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-neutral-900 transition-all"
+                autoFocus
+              />
+              <button
+                type="submit"
+                className="px-6 py-2 bg-neutral-900 text-white rounded-lg hover:bg-neutral-800 transition-colors"
+              >
+                Search
+              </button>
+            </form>
+          </div>
+        )}
+
+        {/* Mobile Menu */}
+        {showMobileMenu && (
+          <div className="md:hidden border-t border-neutral-200 py-4 space-y-4">
+            <Link
+              to="/shop"
+              onClick={() => setShowMobileMenu(false)}
+              className="block px-4 py-2 text-neutral-600 hover:text-neutral-900 transition-colors"
+            >
+              Shop
+            </Link>
+            <Link
+              to="/shop"
+              onClick={() => setShowMobileMenu(false)}
+              className="block px-4 py-2 text-neutral-600 hover:text-neutral-900 transition-colors"
+            >
+              Collections
+            </Link>
+            <Link
+              to="/about"
+              onClick={() => setShowMobileMenu(false)}
+              className="block px-4 py-2 text-neutral-600 hover:text-neutral-900 transition-colors"
+            >
+              About
+            </Link>
+          </div>
+        )}
       </div>
     </nav>
   );

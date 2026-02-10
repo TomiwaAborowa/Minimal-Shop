@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { SlidersHorizontal, X } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
@@ -7,6 +9,7 @@ export function ProductListingPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+  const [sortBy, setSortBy] = useState('best-selling');
 
   const products = [
     {
@@ -71,8 +74,28 @@ export function ProductListingPage() {
 
   const categories = ['All', 'Audio', 'Wearables', 'Photography', 'Accessories', 'Electronics'];
 
+  const getSortedProducts = () => {
+    let sorted = [...products];
+    
+    if (sortBy === 'price-low') {
+      sorted.sort((a, b) => a.price - b.price);
+    } else if (sortBy === 'price-high') {
+      sorted.sort((a, b) => b.price - a.price);
+    } else if (sortBy === 'newest') {
+      sorted.reverse();
+    }
+    
+    return sorted
+      .filter((product) =>
+        selectedCategory ? product.category === selectedCategory : true
+      )
+      .filter((product) => product.price <= priceRange[1]);
+  };
+
+  const filteredProducts = getSortedProducts();
+
   return (
-    <div className="min-h-screen bg-white"> 
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-neutral-50 border-b border-neutral-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
@@ -234,24 +257,23 @@ export function ProductListingPage() {
           {/* Products Grid */}
           <div className="flex-1">
             <div className="flex items-center justify-between mb-8">
-              <p className="text-neutral-600">{products.length} Products</p>
-              <select className="px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-neutral-900 transition-all">
-                <option>Best Selling</option>
-                <option>Price: Low to High</option>
-                <option>Price: High to Low</option>
-                <option>Newest</option>
+              <p className="text-neutral-600">{filteredProducts.length} Products</p>
+              <select 
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-neutral-900 transition-all"
+              >
+                <option value="best-selling">Best Selling</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="newest">Newest</option>
               </select>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-              {products
-                .filter((product) =>
-                  selectedCategory ? product.category === selectedCategory : true
-                )
-                .filter((product) => product.price <= priceRange[1])
-                .map((product) => (
-                  <ProductCard key={product.id} {...product} />
-                ))}
+              {filteredProducts.map((product) => (
+                <ProductCard key={product.id} {...product} />
+              ))}
             </div>
           </div>
         </div>
